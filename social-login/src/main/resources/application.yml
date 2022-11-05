@@ -1,18 +1,31 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
 spring:
+  datasource:
+    password: happy123
+    url: jdbc:mysql://localhost:3306/test
+    username: root
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+
   security:
     oauth2:
       client:
         registration:
           google:
-            clientId: 652083738037-b0nnar9scg6o7vp4p9ptss4cfcpqjv36.apps.googleusercontent.com
-            clientSecret: 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
+            clientId: clientId
+            clientSecret: secret
             redirect-uri: http://localhost:8080/oauth2/callback/google
             scope:
               - email
               - profile
           facebook:
-            clientId: 637351364555404
-            clientSecret: 0c94b680b5a5bedf06fa6421fbdba234
+            clientId: clientId
+            clientSecret: secret
             redirect-uri: http://localhost:8080/oauth2/callback/facebook
             scope:
               - email
