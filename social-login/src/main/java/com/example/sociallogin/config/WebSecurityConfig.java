@@ -22,10 +22,19 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/hello").permitAll()
+                .antMatchers("/", "/login").permitAll()
                 .anyRequest().authenticated()
                 .and()
+                .formLogin().permitAll()
+                    .loginPage("/login")
+                    .usernameParameter("email")
+                    .passwordParameter("pass")
+                .and()
                 .oauth2Login()
+                    .loginPage("/login")
+                    .userInfoEndpoint()
+                    .userService(defaultOAuth2UserService)
+                .and()
                 .redirectionEndpoint()
                 .baseUri("/oauth2/callback/*");
     }
