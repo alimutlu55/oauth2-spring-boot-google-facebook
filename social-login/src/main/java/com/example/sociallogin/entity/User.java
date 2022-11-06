@@ -1,6 +1,6 @@
-package com.example.sociallogin.model;
+package com.example.sociallogin.entity;
 
-import com.example.sociallogin.enums.AuthenticationType;
+import com.example.sociallogin.oauth.enums.AuthenticationType;
 
 import javax.persistence.*;
 import java.io.Serializable;

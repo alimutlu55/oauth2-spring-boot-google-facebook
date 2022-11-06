@@ -1,7 +1,7 @@
 package com.example.sociallogin.service;
 
-import com.example.sociallogin.model.User;
-import com.example.sociallogin.model.UserPrincipal;
+import com.example.sociallogin.entity.User;
+import com.example.sociallogin.oauth.model.UserPrincipal;
 import com.example.sociallogin.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -9,7 +9,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.Objects;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
@@ -26,6 +25,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             throw new UsernameNotFoundException("Could not find user");
         }
 
-        return new UserPrincipal(user);
+        return UserPrincipal.create(user);
     }
 }

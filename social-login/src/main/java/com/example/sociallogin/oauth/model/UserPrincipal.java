@@ -1,19 +1,29 @@
-package com.example.sociallogin.model;
+package com.example.sociallogin.oauth.model;
 
+import com.example.sociallogin.entity.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static java.util.Arrays.stream;
 
-public class UserPrincipal implements UserDetails {
+public class UserPrincipal implements UserDetails, OAuth2User {
     private User user;
 
-    public UserPrincipal(User user) {
+    private Map<String, Object> attributes;
+
+    private UserPrincipal(User user) {
         this.user = user;
+    }
+
+    @Override
+    public Map<String, Object> getAttributes() {
+        return attributes;
     }
 
     @Override
@@ -29,6 +39,18 @@ public class UserPrincipal implements UserDetails {
     @Override
     public String getUsername() {
         return this.user.getUsername();
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public void setAttributes(Map<String, Object> attributes) {
+        this.attributes = attributes;
     }
 
     @Override
@@ -51,4 +73,19 @@ public class UserPrincipal implements UserDetails {
         return true;
     }
 
+    @Override
+    public String getName() {
+        return user.getUsername();
+    }
+
+    public static UserPrincipal create(User user) {
+        return new UserPrincipal(user);
+    }
+
+    public static UserPrincipal create(User user, Map<String, Object> attributes) {
+        UserPrincipal userPrincipal = create(user);
+        userPrincipal.setAttributes(attributes);
+
+        return userPrincipal;
+    }
 }

@@ -1,8 +1,10 @@
-package com.example.sociallogin.service;
+package com.example.sociallogin.oauth.service;
 
-import com.example.sociallogin.enums.AuthenticationType;
-import com.example.sociallogin.model.CustomOAuth2User;
-import com.example.sociallogin.model.User;
+import com.example.sociallogin.oauth.enums.AuthenticationType;
+import com.example.sociallogin.oauth.info.OAuth2UserFactory;
+import com.example.sociallogin.oauth.model.OAuth2UserInfo;
+import com.example.sociallogin.entity.User;
+import com.example.sociallogin.oauth.model.UserPrincipal;
 import com.example.sociallogin.repository.UserRepository;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.AuthenticationException;
@@ -14,7 +16,6 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-
 
 @Service
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
@@ -40,10 +41,11 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     }
 
     private OAuth2User process(OAuth2UserRequest userRequest, OAuth2User user) {
-        AuthenticationType providerType = AuthenticationType.valueOf(userRequest.getClientRegistration().getRegistrationId().toUpperCase());
+        AuthenticationType authenticationType = AuthenticationType.valueOf(userRequest.getClientRegistration().getRegistrationId().toUpperCase());
 
-        CustomOAuth2User customOAuth2User = new CustomOAuth2User(user, providerType.name());
-        User savedUser = userRepository.getUserByUsername(customOAuth2User.getEmail());
+        OAuth2UserInfo oAuth2UserInfo = OAuth2UserFactory.getOAuth2User(authenticationType, user.getAttributes());
+
+        User savedUser = userRepository.getUserByUsername(oAuth2UserInfo.getEmail());
 
         if (savedUser != null) {
 //            if (providerType != savedUser.getAuthType()) {
@@ -52,32 +54,32 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 //                                " account. Please use your " + savedUser.getAuthType() + " account to login."
 //                );
 //            }
-            updateAuthenticationType(customOAuth2User);
+            updateAuthenticationType(oAuth2UserInfo, authenticationType);
         } else {
-            savedUser = saveOauth2User(customOAuth2User);
+            savedUser = saveOauth2User(oAuth2UserInfo, authenticationType);
         }
 
-        return new CustomOAuth2User(user, userRequest.getClientRegistration().getClientName());
+        return UserPrincipal.create(savedUser, user.getAttributes());
     }
 
-    public User saveOauth2User(CustomOAuth2User user) {
+    public User saveOauth2User(OAuth2UserInfo user, AuthenticationType authenticationType) {
         User oauthUser = new User();
         oauthUser.setUsername(user.getEmail());
-        oauthUser.setAuthType(AuthenticationType.valueOf(user.getOauth2ClientName()));
+        oauthUser.setAuthType(authenticationType);
         oauthUser.setAuthorities(new String[]{"read"});
         return userRepository.save(oauthUser);
     }
 
     @Transactional
-    public void updateAuthenticationType(CustomOAuth2User oAuth2User) {
-        User user = userRepository.getUserByUsername(oAuth2User.getEmail());
+    public void updateAuthenticationType(OAuth2UserInfo oAuth2UserInfo, AuthenticationType authenticationType) {
+        User user = userRepository.getUserByUsername(oAuth2UserInfo.getEmail());
 
         if (user == null) {
             throw new UsernameNotFoundException("Could not find user");
         }
-        user.setAuthType(AuthenticationType.valueOf(oAuth2User.getOauth2ClientName()));
+        user.setAuthType(authenticationType);
         userRepository.save(user);
-        System.out.println("Updated user's authentication type to " + oAuth2User.getOauth2ClientName());
+        System.out.println("Updated user's authentication type to " + authenticationType);
     }
 
 }

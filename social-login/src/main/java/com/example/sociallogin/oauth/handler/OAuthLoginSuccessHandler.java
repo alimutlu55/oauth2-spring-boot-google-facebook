@@ -1,6 +1,5 @@
-package com.example.sociallogin.config;
+package com.example.sociallogin.oauth.handler;
 
-import com.example.sociallogin.service.UserDetailsServiceImpl;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -12,12 +11,6 @@ import java.io.IOException;
 
 @Component
 public class OAuthLoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
-
-    private final UserDetailsServiceImpl userDetailsService;
-
-    public OAuthLoginSuccessHandler(UserDetailsServiceImpl userRepository) {
-        this.userDetailsService = userRepository;
-    }
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,

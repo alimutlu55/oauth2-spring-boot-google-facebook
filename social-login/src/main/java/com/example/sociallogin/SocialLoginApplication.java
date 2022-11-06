@@ -1,7 +1,7 @@
 package com.example.sociallogin;
 
-import com.example.sociallogin.enums.AuthenticationType;
-import com.example.sociallogin.model.User;
+import com.example.sociallogin.oauth.enums.AuthenticationType;
+import com.example.sociallogin.entity.User;
 import com.example.sociallogin.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
